@@ -1,33 +1,37 @@
 var os = require('os');
- var pty = require('node-pty');
- var stripAnsi = require('strip-ansi');
- // path to mongo shell on os
- var ptyProcess = pty.spawn('mongo', [], {
-   name: 'xterm-color',
-   cols: 100,
-   rows: 10000,
-   cwd: process.env.HOME,
-   env: process.env
- });
- 
+var pty = require('node-pty');
+var stripAnsi = require('strip-ansi');
+// path to mongo shell on os
+var ptyProcess = pty.spawn('mongo1', [], {
+    name: 'xterm-color',
+    cols: 100,
+    rows: 10000,
+    cwd: process.env.HOME,
+    env: process.env
+});
+
 var LineStream = require('byline').LineStream;
 var lineStream = new LineStream();
 // ptyProcess.pipe(lineStream);
- lineStream.on('readable', function() {
-  var line;
-  while (null !== (line = lineStream.read())) {
-    // console.log('byline:', stripAnsi(line));
-  }
-  lineStream._flush(() => {});
+lineStream.on('readable', function() {
+    var line;
+    while (null !== (line = lineStream.read())) {
+        // console.log('byline:', stripAnsi(line));
+    }
+    lineStream._flush(() => {});
 });
 lineStream.on('endOfOutput', function() {
-  console.log('---------END--------');
+    console.log('---------END--------');
 });
 
-ptyProcess.on('data', (d)=>{
+ptyProcess.on('data', (d) => {
 
-  console.log('data:',d);
+    console.log('data:', d);
 })
+
+ptyProcess.on('exit', function(e) {
+    console.log('exit:', e);
+});
 
 //  lineStream.on('readable', function() {
 //    var line;
