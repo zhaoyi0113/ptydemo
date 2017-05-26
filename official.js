@@ -1,24 +1,13 @@
-var pty = require('pty.js');
+const child = require('child_process')
+const mongodb = require('mongodb');
+try {
+  const output = child.execSync('mongo --version').toString();
+  console.log(output.split('\n').length);
+  console.log(output.split('\n')[0].replace('MongoDB shell version v', '').trim());
+} catch (err) {}
 
-var term = pty.spawn('bash', [], {
-  name: 'xterm-color',
-  cols: 80,
-  rows: 30,
-  cwd: process.env.HOME,
-  env: process.env
+const mongoClient = mongodb.MongoClient;
+mongoClient.connect('mongodb://localhost', (err, db) => {
+  console.log('success');
+  db.command({ buildinfo: 1 }).then((v) => console.log(v))
 });
-
-term.on('data', function(data) {
-  console.log(data);
-});
-
-// term.write('echo hello\n');
-// term.resize(100, 40);
-// term.write('ls /\r');
-
-// console.log('process:',term.process);
-
-
-const partern = '\S+';
-const m = 'dfas:kdlsf@lkdjsa:99\ndkljsl'.match(/(\S+):(\S+)@(\S+)(:(\d+))?/);
-console.log(m)

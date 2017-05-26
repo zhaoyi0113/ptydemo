@@ -2,7 +2,7 @@ var os = require('os');
 var pty = require('node-pty');
 var stripAnsi = require('strip-ansi');
 // path to mongo shell on os
-var ptyProcess = pty.spawn('mongo1', [], {
+var ptyProcess = pty.spawn('mongo', [], {
     name: 'xterm-color',
     cols: 100,
     rows: 10000,
@@ -33,6 +33,8 @@ ptyProcess.on('exit', function(e) {
     console.log('exit:', e);
 });
 
+// ptyProcess.destroy();
+
 //  lineStream.on('readable', function() {
 //    var line;
 //    while (null !== (line = lineStream.read())) {
@@ -45,6 +47,7 @@ ptyProcess.on('exit', function(e) {
 // });
 // ptyProcess.write('var prompt="dbenvy> "\n')
 ptyProcess.write('db\t\t');
+// ptyProcess.write('\x03');
 // ptyProcess.write('\b\b\b');
 // ptyProcess.write('show collections \n');
 // ptyProcess.write('}\r');
