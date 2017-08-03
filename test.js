@@ -1,4 +1,15 @@
-let str='mongodb://mongodb.net:27017,mongodb.net:27017,00-02-oexhg.mongodb.net:27017/admin?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin'
 
-let m = str.match(/mongodb:\/\/(\S+):(\S+)@(\S+)/)
-console.log(m);
+const spawn = require('node-pty').spawn;
+const spawnOptions = {
+      name: 'xterm-color',
+      cols: 10000,
+      rows: 10000,
+      cwd: '.',
+      env: process.env
+    };
+
+try{
+    spawn('c:\tools\3.4\bin\mongo', ['mongodb://192.168.1.5'], spawnOptions)
+}catch(_){
+    console.log('error')
+}

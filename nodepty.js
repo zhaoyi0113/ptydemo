@@ -1,28 +1,49 @@
 let pty = require('node-pty');
 var os = require('os');
-console.log(os.platform());
+const {StringDecoder} = require('string_decoder');
+console.log(os.platform(), os.release());
 console.log('dirname=', __dirname);
+const path = require('path');
 const fs = require('fs');
-
-fs.readdir('/tmfsfp', (err, files) => {
-    console.log('xxxx:', files, err);
-})
+const stripAnsi = require('strip-ansi');
+var shellCommand =  os.platform() === 'win32' ? 'cmd' : 'bash';
+console.log('path = ', path.join(__dirname, '\\'));
 const dirname = __dirname;
-let ptyProcess = pty.spawn('bash', ['-c', 'mongo --host localhost --shell ' + dirname + '/load.1js'], {
-    name: 'xterm-color',
-    cols: 80,
-    rows: 30,
+const decoder = new StringDecoder('utf8');
+const baseEnv = Object.assign({}, process.env, {
+      LANG: 'en_US.UTF-8',
+      TERM: 'xterm-256color',
+    });
+let ptyProcess = pty.spawn('cmd.exe', ['/c', 'mongo ', 'mongodb://dbenvy:DBEnvy2016@ec2-13-54-17-227.ap-southeast-2.compute.amazonaws.com/admin'], {
+
+    cols: 10000,
+    rows: 24,
     cwd: process.env.HOME,
-    env: process.env
+    env: baseEnv
 });
 
-ptyProcess.write('show dbs\r');
 ptyProcess.on('data', function(data) {
-    //console.log('got data:' + data + '.');
+    const o = decoder.write(data);
+    if(o.indexOf('db.getSiblingDB("admin").runCommand( { getParameter : "*" })') >=0 ){
+        ptyProcess.write('\r');
+    }
+    console.log(o);
 });
 ptyProcess.on('exit', function(data) {
     console.log('exit', data);
 });
+ptyProcess.write('db.getSiblingDB("admin").runCommand( { getParameter : "*" })');
+// ptyProcess.write('dir\r')
+// ptyProcess.write('use SampleCollections\r');
+// ptyProcess.write('show collections\r');
+// ptyProcess.write('db.explains.find().limit(20).toArray()\r');
+// ptyProcess.write('show dbs\r');
+// ptyProcess.write('show dbs');
+// ptyProcess.write('\r');
+// ptyProcess.write('show dbs\r');
+// ptyProcess.write('show dbs\r');
+// ptyProcess.write('show dbs\r');
 //ptyProcess.write('load("/Users/joey/dev/dbenvy-controller/src/mongoScripts/dbe_functions.js");');
 // ptyProcess.write('db.inspections.find(\r');
 // ptyProcess.write(')\r');
+//ptyProcess.destroy();
