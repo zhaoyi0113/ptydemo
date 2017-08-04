@@ -1,5 +1,7 @@
 let pty = require('node-pty');
 const stripAnsi = require('strip-ansi');
+const { StringDecoder } = require('string_decoder');
+const decoder = new StringDecoder('utf8');
 let ptyProcess = pty.spawn('mongo', [], {
   name: 'xterm-color',
   cols: 80,
@@ -9,18 +11,18 @@ let ptyProcess = pty.spawn('mongo', [], {
 });
 
 ptyProcess.on('data', function(data) {
-  const o = stripAnsi(data);
+  const o = decoder.write(data);
   process.stdout.write(o);
 });
 ptyProcess.on('exit', function(data) {
   console.log('exit', data);
 });
 setTimeout(() => {
-  ptyProcess.write('db');
+  ptyProcess.write('show dbs');
 }, 1000);
 setTimeout(() => {
   ptyProcess.write('\r');
-}, 1000);
+}, 2000);
 
 
 // ptyProcess.write('db.getSiblingDB("admin").runCommand( { getParameter : "*" })');
